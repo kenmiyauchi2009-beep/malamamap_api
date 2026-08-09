@@ -8,10 +8,20 @@
 - CPU では画像1枚のエンコードに数秒かかる（GPU 版より遅い）。低トラフィック
   なデモ／検証用途を想定。
 
-起動例:
-    .venv\\Scripts\\uvicorn api_cpu:app --host 0.0.0.0 --port 8000
+起動例（Ubuntu / Linux）:
+    # HTTPS 終端は前段の Caddy が担当するため localhost のみで待ち受ける。
+    # 外部公開は Caddy(443) 経由: https://<サーバ>/ でアクセスする。
+    .venv/bin/uvicorn api_cpu:app --host 127.0.0.1 --port 8000
 または:
-    .venv\\Scripts\\python api_cpu.py
+    .venv/bin/python api_cpu.py
+仮想環境を有効化してから起動する場合:
+    source .venv/bin/activate
+    uvicorn api_cpu:app --host 127.0.0.1 --port 8000
+
+（Caddy を使わず uvicorn を直接外部公開する場合のみ --host 0.0.0.0 にする）
+
+起動例（Windows）:
+    .venv\\Scripts\\uvicorn api_cpu:app --host 0.0.0.0 --port 8000
 
 エンドポイント・パラメータは api.py と同一:
     GET  /            … ブラウザで試せる簡易アップロードフォーム
@@ -258,4 +268,6 @@ def index():
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # HTTPS 終端は前段の Caddy が担当し、外部公開は 443 経由に一本化する。
+    # バックエンドは localhost のみで待ち受け、8000 番を外部に晒さない。
+    uvicorn.run(app, host="127.0.0.1", port=8000)
